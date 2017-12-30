@@ -42,19 +42,19 @@ for(table in pdf_tables){
   assign(paste("WIG30SHARE",gsub("-", "", date2),sep=""), df_share)
 }
 
-# Merge prices and shares
+# Merge shares
 list_df_share <- lapply(ls(pattern = "WIG30SHARE"), 
                         function(x) if (class(get(x)) == "data.frame") get(x))
 
 df_share <- do.call(rbind.data.frame, list_df_share)
 share_data <- reshape(df_share, idvar = "Date", timevar="Company", 
                       direction = "wide")
+colnames(share_data) <- lapply(colnames(share_data), gsub, pattern = "Share.", 
+                               replacement = "")
 
 ## Get comapny names
 temp_comapny_names <-colnames(share_data)[-1]
-temp_comapny_names1 <- lapply(temp_comapny_names, gsub, pattern = "Share.", 
-                              replacement = "")
-index_company_names <- unlist(temp_comapny_names1)
+index_company_names <- unlist(temp_comapny_names)
 
 # Clean workspace after extracting data
 rm(df, df_share, extracted_table, date, date2, i, pdf_tables, 
