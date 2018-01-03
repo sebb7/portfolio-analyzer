@@ -2,7 +2,10 @@
 # Save list of companies and their share in given index 
 # Used library https://github.com/ropensci/tabulizer
 ###############################################################################
+
+#install.packages("tabulizer", "stringr")
 library(tabulizer)
+library(stringr)
 
 pdf_tables <- list.files(path = "./historical_compositions_of_index",
                          full.names = TRUE)
@@ -22,14 +25,8 @@ for(table in pdf_tables){
                  sep="")
   
   for(i in 1:length(extracted_table)){
-    extracted_table[[i]] <- tryCatch(
-      {
-        subset(extracted_table[[i]], select = c(X.2, Kurs, Udział))
-      },
-      error=function(e){
-        return(subset(extracted_table[[i]], select = c(X.2, X.3, Udział)))
-      })
-    colnames(extracted_table[[i]]) <- c("Company", "Price", "Share")
+    extracted_table[[i]] <- subset(extracted_table[[i]], select = c(X, Udział))
+    colnames(extracted_table[[i]]) <- c("ISIN", "Share")
     extracted_table[[i]] <- (extracted_table[[i]])[-c(1), ]
     extracted_table[[i]]$Date <- as.Date(date2)
   }
@@ -37,8 +34,10 @@ for(table in pdf_tables){
   rownames(df) <- NULL
   
   # Create data frame for share in index
-  df_share <- data.frame(df$Date, df$Company, df$Share)
-  colnames(df_share) <- c("Date", "Company", "Share")
+  df_share <- data.frame(df$Date, df$ISIN, df$Share)
+  colnames(df_share) <- c("Date", "ISIN", "Share")
+  # Correct ISIN
+  df_share$ISIN <- unlist(lapply(df_share$ISIN, str_sub, start = -12, end = -1))
   assign(paste("WIG30SHARE",gsub("-", "", date2),sep=""), df_share)
 }
 
@@ -47,21 +46,20 @@ list_df_share <- lapply(ls(pattern = "WIG30SHARE"),
                         function(x) if (class(get(x)) == "data.frame") get(x))
 
 df_share <- do.call(rbind.data.frame, list_df_share)
-share_data <- reshape(df_share, idvar = "Date", timevar="Company", 
+share_data <- reshape(df_share, idvar = "Date", timevar="ISIN", 
                       direction = "wide")
 colnames(share_data) <- lapply(colnames(share_data), gsub, pattern = "Share.", 
                                replacement = "")
 
-## Get comapny names
-temp_comapny_names <-colnames(share_data)[-1]
-index_company_names <- unlist(temp_comapny_names)
+# Get comapny names
+temp_comapny_isins <-colnames(share_data)[-1]
+index_company_isins <- unlist(temp_comapny_isins)
 
 # Clean workspace after extracting data
 rm(df, df_share, extracted_table, date, date2, i, pdf_tables, 
-   table, list=ls(pattern="WIG"), list_df_share, temp_comapny_names,
-   temp_comapny_names1)
+   table, list=ls(pattern="WIG"), list_df_share, temp_comapny_isins)
 
 
-#save or load extracted nad proper data
+# Save proper data
 save(share_data, file = "./R_data/share_data.Rda")
-save(index_company_names, file = "./R_data/index_company_names.Rda")
+save(index_company_isins, file = "./R_data/index_company_isins.Rda")
