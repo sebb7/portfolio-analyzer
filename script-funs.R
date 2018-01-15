@@ -16,8 +16,10 @@ DownloadHistData <- function(ticker_vector){
   }
 }
 
-TransformDataToCombinedXts <- function(){
-  # Transforms all downloaded files to xts and returns it
+TransformDataToCombinedXtsReturns <- function(to_skip){
+  # Transforms all downloaded files from companies_and_index_historical_data 
+  # folder but for ticker given as function argument
+  # Returns xts
   # Returned data is comapnies reurns from previous years
   # If given file has no data saves it in stooq_no_data_files.csv
   
@@ -25,6 +27,9 @@ TransformDataToCombinedXts <- function(){
   exstg_files_tickers <- unlist(lapply(list.files(
     "companies_and_index_historical_data"), gsub, pattern = ".csv",
     replacement = ""))
+  
+  # Skip given tickiers
+  exstg_files_tickers <- setdiff(exstg_files_tickers, to_skip)
   
   file_list <- list()
   no_data_files <- character()
@@ -52,4 +57,15 @@ TransformDataToCombinedXts <- function(){
   return(all_returns)
 }
 
+TransformDataFrameToXtsReturns <- function(ticker){
+  # Transforms data frame to xts
+  # Returns only returns
+  df <- read.csv(paste("./companies_and_index_historical_data/", ticker,
+                       ".csv", sep=""), header=TRUE)
+  
+  df <- xts(df$Close, order.by = as.Date(df$Date))
+  returns <- diff(log(df))
+  names(returns) <- c(paste(ticker, "rr"))
+  return(returns)
+}
 

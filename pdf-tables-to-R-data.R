@@ -3,6 +3,9 @@
 # Used library https://github.com/ropensci/tabulizer
 ###############################################################################
 
+# Data download from https://www.gpw.pl/historical-index-portfolios 
+# for given index
+
 #install.packages("tabulizer", "stringr")
 library(tabulizer)
 library(stringr)
