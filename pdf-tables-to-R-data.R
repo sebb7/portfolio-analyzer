@@ -39,6 +39,11 @@ for(table in pdf_tables){
   # Create data frame for share in index
   df_share <- data.frame(df$Date, df$ISIN, df$Share)
   colnames(df_share) <- c("Date", "ISIN", "Share")
+  
+  # Change factors to numbers
+  df_share$Share <- unlist(lapply(df_share$Share, function(x) 
+    as.numeric(gsub(",", ".", gsub("\\.", "", x)))))
+  
   # Correct ISIN
   df_share$ISIN <- unlist(lapply(df_share$ISIN, str_sub, start = -12, end = -1))
   assign(paste("WIG30SHARE",gsub("-", "", date2),sep=""), df_share)

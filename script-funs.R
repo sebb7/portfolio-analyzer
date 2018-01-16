@@ -69,3 +69,26 @@ TransformDataFrameToXtsReturns <- function(ticker){
   return(returns)
 }
 
+AddNAToCompaniesNotInIndex <- function(xts_frame, xts_share){
+  # Check data and multiply it by 1 or NA
+  # Returns only non-xts return
+  
+  # Get share for given date
+  share <- tail(xts_share[paste("/", index(xts_frame), sep = "")], 1)[[1]]
+  
+  multiplier <- share/share
+  result <- xts_frame[[1]] * multiplier
+  return(result)
+}
+
+ReturnShareForGivenDay <- function(xts_frame, xts_share){
+  # Check data and comapny name and return share for it
+  # Returns only non-xts percentage share for given day
+  
+  # Get share for given date
+  share <- tail(xts_share[paste("/", index(xts_frame), sep = "")], 1)[[1]]
+  percentage_share <- share/100
+  result <- percentage_share
+  return(result)
+}
+
