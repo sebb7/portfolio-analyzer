@@ -3,6 +3,7 @@ library(urca)
 library(PerformanceAnalytics)
 library(fBasics)
 library(xtable)
+library(xts)
 
 # Risk-free rate in Poland (2013 - now) sorce: www.market-risk-premia.com
 rf_rate <- 0.0328
@@ -29,9 +30,8 @@ SharpeRatio.annualized(portfolio_iclud_composition$Mean_rr,
                        colMeans(stock_index_rr), scale = 1)
 
 # Portfolios returns to benchmark return
-table.CAPM(portfolio_all$Mean_rr, stock_index_rr, Rf = rf_rate)
-table.CAPM(portfolio_iclud_composition$Mean_rr, stock_index_rr, Rf = rf_rate)
-table.CAPM(portfolio_iclud_composition$Mean_rr, stock_index_rr, Rf = rf_rate)
+table.CAPM(portfolio_all$Mean_rr, stock_index_rr)
+table.CAPM(portfolio_iclud_composition$Mean_rr, stock_index_rr)
 
 # Plots for returns
 plot(stock_index_rr, main = "WIG30 returns")
