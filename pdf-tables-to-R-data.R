@@ -14,11 +14,11 @@ pdf_tables <- list.files(path = "./historical_compositions_of_index",
                          full.names = TRUE)
 
 for(table in pdf_tables){
-  extracted_table <- extract_tables(table, method = "data.frame", 
+  extracted_table <- extract_tables(table, method = c("decide"), output = c("data.frame"),
                                     area = list(c(126, 300, 174, 417)))
   
   if(length(extracted_table) == 0){
-    extracted_table <- extract_tables(table, method = "data.frame", 
+    extracted_table <- extract_tables(table, method = c("decide"), output = c("data.frame"),
                                       area = list(c(126, 149, 212, 462)))
     extracted_table[[1]] <- (extracted_table[[1]])[-c(2,3), ]
   }
